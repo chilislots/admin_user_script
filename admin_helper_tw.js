@@ -6,14 +6,14 @@
 // @include	*twist*adm*
 // ==/UserScript==
 
-//Общие функции
+//РћР±С‰РёРµ С„СѓРЅРєС†РёРё
 
 function dateDDMMYY(date) {
 	return date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear().toString().substr(2, 2);
 }
 
 function roundToCents(val) {
-//округляет число до .00
+//РѕРєСЂСѓРіР»СЏРµС‚ С‡РёСЃР»Рѕ РґРѕ .00
 	val = val * 100;
 	if (val > 0) {val = Math.round(val) / 100}
 	if (val < 0) {val = Math.floor(val) / 100}
@@ -30,7 +30,7 @@ today = new Date(today[1], today[2] - 1, today[3], today[4], today[5], today[6],
 if ((today.getFullYear() % 4 == 0 && today.getFullYear() % 100 != 0) || (today.getFullYear() % 400 == 0)) {daysMonth[1] = 29}
 var adminLogin = document.getElementsByTagName('h5')[0].innerHTML.match(/^(.+), <.+$/)[1];
 
-//Функции для профиля игрока
+//Р¤СѓРЅРєС†РёРё РґР»СЏ РїСЂРѕС„РёР»СЏ РёРіСЂРѕРєР°
 
 var deps;
 var withs;
@@ -38,12 +38,12 @@ var wager;
 var realToGive;
 var operations = [];
 var cash;
-//var playerStatus; //обычный, Gold, VIP
+//var playerStatus; //РѕР±С‹С‡РЅС‹Р№, Gold, VIP
 var transactions;
 var bonusOffers;
 
 function getDepsAll() {
-//Функция считает сумму сделанных депозитов
+//Р¤СѓРЅРєС†РёСЏ СЃС‡РёС‚Р°РµС‚ СЃСѓРјРјСѓ СЃРґРµР»Р°РЅРЅС‹С… РґРµРїРѕР·РёС‚РѕРІ
 	var a = 0;
 	var deps = 0;
 	var tag = document.getElementsByTagName('*');
@@ -57,7 +57,7 @@ function getDepsAll() {
 }
 
 function getWithdrawsAll() {
-//Функция считает сумму выплат
+//Р¤СѓРЅРєС†РёСЏ СЃС‡РёС‚Р°РµС‚ СЃСѓРјРјСѓ РІС‹РїР»Р°С‚
 	var a = 0;
 	var withdraws = 0;
 	var tag = document.getElementsByTagName('*');
@@ -71,7 +71,7 @@ function getWithdrawsAll() {
 }
 
 function getOperations() {
-//Кладет в массив operations операции со счетом из блока "переводы" в профиле игрока
+//РљР»Р°РґРµС‚ РІ РјР°СЃСЃРёРІ operations РѕРїРµСЂР°С†РёРё СЃРѕ СЃС‡РµС‚РѕРј РёР· Р±Р»РѕРєР° "РїРµСЂРµРІРѕРґС‹" РІ РїСЂРѕС„РёР»Рµ РёРіСЂРѕРєР°
 	var tag = document.getElementsByTagName('u');
 	var a = 0;
 	while (tag[a].innerHTML != 'Wager') {a++}
@@ -132,7 +132,7 @@ function getAllTransactions() {
 	
 	document.getElementsByTagName('body')[0].innerHTML = document.getElementsByTagName('body')[0].innerHTML + code;
 	
-	//Собираем транзакции в массив
+	//РЎРѕР±РёСЂР°РµРј С‚СЂР°РЅР·Р°РєС†РёРё РІ РјР°СЃСЃРёРІ
 	var mas = new Array();
 		
 	tag = document.getElementById('transactionsTable');
@@ -159,7 +159,7 @@ function getAllTransactions() {
 }
 
 function getStartEndDates(offer) {
-	var params = offer.match(/^(\d{2})-(\d{2})-(\d{2}) (\d{2}):(\d{2}) до (\d{2})-(\d{2})-(\d{2}) (\d{2}):(\d{2}).+$/);
+	var params = offer.match(/^(\d{2})-(\d{2})-(\d{2}) (\d{2}):(\d{2}) РґРѕ (\d{2})-(\d{2})-(\d{2}) (\d{2}):(\d{2}).+$/);
 	var startDate = new Date(+params[3] + 2000, params[2] - 1, params[1], params[4], params[5]);
 	var endDate = new Date(+params[8] + 2000, params[7] - 1, params[6], params[9], params[10]);
 	return [startDate, endDate]
@@ -171,20 +171,20 @@ function updateBonusOffers() {
 }
 
 function depositsAmountForOffer(startDate) {
-	//Определяет сумму депозитов, сделанных после начала акции, а также после последней выплаты и последнего бонуса от администратора
+	//РћРїСЂРµРґРµР»СЏРµС‚ СЃСѓРјРјСѓ РґРµРїРѕР·РёС‚РѕРІ, СЃРґРµР»Р°РЅРЅС‹С… РїРѕСЃР»Рµ РЅР°С‡Р°Р»Р° Р°РєС†РёРё, Р° С‚Р°РєР¶Рµ РїРѕСЃР»Рµ РїРѕСЃР»РµРґРЅРµР№ РІС‹РїР»Р°С‚С‹ Рё РїРѕСЃР»РµРґРЅРµРіРѕ Р±РѕРЅСѓСЃР° РѕС‚ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°
 	if (!transactions) {transactions = getAllTransactions()}
 	if (transactions == -1) {return 0}
-	//Узнаем количество успешных транзакций, сделанных после начала акции
+	//РЈР·РЅР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ СѓСЃРїРµС€РЅС‹С… С‚СЂР°РЅР·Р°РєС†РёР№, СЃРґРµР»Р°РЅРЅС‹С… РїРѕСЃР»Рµ РЅР°С‡Р°Р»Р° Р°РєС†РёРё
 	var num = 0;
 	for (var a in transactions) {
 		if (transactions[a].status.indexOf('OK') != -1 && transactions[a].date >= startDate) {num++} else {break}	
 	}
 	if (num == 0) {return 0}
-	//Определяем сумму депозитов
+	//РћРїСЂРµРґРµР»СЏРµРј СЃСѓРјРјСѓ РґРµРїРѕР·РёС‚РѕРІ
 	var numOp = 0;
 	var sum = 0;
 	for (var b in operations) {
-		if (operations[b].admin != '' /* бонус от администратора */ || operations[b].amount < 0 /* выплата */) {break}
+		if (operations[b].admin != '' /* Р±РѕРЅСѓСЃ РѕС‚ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° */ || operations[b].amount < 0 /* РІС‹РїР»Р°С‚Р° */) {break}
 		if (operations[b].system == 'Administrator' || operations[b].system.indexOf('Bonus') != -1) {continue}
 		sum += operations[b].amount;
 		numOp++;
@@ -195,113 +195,113 @@ function depositsAmountForOffer(startDate) {
 
 function createControl1(offer, a) { 
 /* 
-	Обработка акции "один бонус на следующий депозит"
-	пример:
-	31-09-12 23:59 до 05-10-12 00:00 [акция] один бонус на след деп, 20%, мин деп 123$, макс бон 100$, вейджер 40
-	31-09-12 23:59 до 05-10-12 00:00 [акция] один бонус на след деп, 20%, мин деп 123$, макс бон 100$, вейджер 40; акция окончена
+	РћР±СЂР°Р±РѕС‚РєР° Р°РєС†РёРё "РѕРґРёРЅ Р±РѕРЅСѓСЃ РЅР° СЃР»РµРґСѓСЋС‰РёР№ РґРµРїРѕР·РёС‚"
+	РїСЂРёРјРµСЂ:
+	31-09-12 23:59 РґРѕ 05-10-12 00:00 [Р°РєС†РёСЏ] РѕРґРёРЅ Р±РѕРЅСѓСЃ РЅР° СЃР»РµРґ РґРµРї, 20%, РјРёРЅ РґРµРї 123$, РјР°РєСЃ Р±РѕРЅ 100$, РІРµР№РґР¶РµСЂ 40
+	31-09-12 23:59 РґРѕ 05-10-12 00:00 [Р°РєС†РёСЏ] РѕРґРёРЅ Р±РѕРЅСѓСЃ РЅР° СЃР»РµРґ РґРµРї, 20%, РјРёРЅ РґРµРї 123$, РјР°РєСЃ Р±РѕРЅ 100$, РІРµР№РґР¶РµСЂ 40; Р°РєС†РёСЏ РѕРєРѕРЅС‡РµРЅР°
 */
 	var dates = getStartEndDates(offer);
 	var startDate = dates[0];
 	var endDate = dates[1];
 	if (endDate < today) {
-		if (offer.indexOf('акция окончена') == -1) {
-			bonusOffers[a] += '; акция окончена';
+		if (offer.indexOf('Р°РєС†РёСЏ РѕРєРѕРЅС‡РµРЅР°') == -1) {
+			bonusOffers[a] += '; Р°РєС†РёСЏ РѕРєРѕРЅС‡РµРЅР°';
 			updateBonusOffers();
 		} 
 		return
 	}
-	var params = offer.match(/^.+\[акция\] один бонус на след деп, (\d+)\%, мин деп (\d+)\$, макс бон (\d+)\$, вейджер (\d+).*$/);
+	var params = offer.match(/^.+\[Р°РєС†РёСЏ\] РѕРґРёРЅ Р±РѕРЅСѓСЃ РЅР° СЃР»РµРґ РґРµРї, (\d+)\%, РјРёРЅ РґРµРї (\d+)\$, РјР°РєСЃ Р±РѕРЅ (\d+)\$, РІРµР№РґР¶РµСЂ (\d+).*$/);
 	var percent = params[1];
 	var minDep = params[2];
 	var maxBon = params[3];
 	var wager = params[4];
-	//Определяется сумма депозитов, за которые можно дать бонус по акции
+	//РћРїСЂРµРґРµР»СЏРµС‚СЃСЏ СЃСѓРјРјР° РґРµРїРѕР·РёС‚РѕРІ, Р·Р° РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РЅРѕ РґР°С‚СЊ Р±РѕРЅСѓСЃ РїРѕ Р°РєС†РёРё
 	var deps = depositsAmountForOffer(startDate);
 	
 	var button = document.createElement('input');
 	button.type = 'button';
 	button.id = 'control' + a;
 	var p = document.createElement('p');
-	p.innerHTML = 'Предложение бонуса на следующий депозит: ' + percent + '%, депозит от ' + minDep + '$, максимальный бонус ' + maxBon + '$, вейджер ' + wager + '.<br>У игрока имеются депозиты на сумму: ' + deps + '$.<br>';
+	p.innerHTML = 'РџСЂРµРґР»РѕР¶РµРЅРёРµ Р±РѕРЅСѓСЃР° РЅР° СЃР»РµРґСѓСЋС‰РёР№ РґРµРїРѕР·РёС‚: ' + percent + '%, РґРµРїРѕР·РёС‚ РѕС‚ ' + minDep + '$, РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ Р±РѕРЅСѓСЃ ' + maxBon + '$, РІРµР№РґР¶РµСЂ ' + wager + '.<br>РЈ РёРіСЂРѕРєР° РёРјРµСЋС‚СЃСЏ РґРµРїРѕР·РёС‚С‹ РЅР° СЃСѓРјРјСѓ: ' + deps + '$.<br>';
 	p.appendChild(button);
 	document.all.item('bonusPanel').appendChild(p);	
 	if (deps >= minDep) {
 		var bonusToGive = roundToCents((percent / 100 * deps > maxBon) ? maxBon : (percent / 100 * deps));
-		button.value = 'Начислить бонус ' + bonusToGive + '$';
+		button.value = 'РќР°С‡РёСЃР»РёС‚СЊ Р±РѕРЅСѓСЃ ' + bonusToGive + '$';
 		button.onclick = function() {
 			document.all.item('fCash_Bonus_Add').value = +document.all.item('fCash_Bonus_Add').value + bonusToGive;
 			document.all.item('fCash_Bonus_Wager').value = wager;
-			bonusOffers[a] += '; акция окончена';
+			bonusOffers[a] += '; Р°РєС†РёСЏ РѕРєРѕРЅС‡РµРЅР°';
 			updateBonusOffers();
-			document.all.item('Comment').innerHTML = dateDDMMYY(today) + ' - бонус ' + bonusToGive + '$ по акции "один бонус на след деп" - ' + adminLogin + '\n' + document.all.item('Comment').innerHTML;
-			alert('Бонус и комемнтарий указаны в соответствующих графах.\nЧтобы начислить бонус и сохранить комментарий, нажмите "Изменить".');
+			document.all.item('Comment').innerHTML = dateDDMMYY(today) + ' - Р±РѕРЅСѓСЃ ' + bonusToGive + '$ РїРѕ Р°РєС†РёРё "РѕРґРёРЅ Р±РѕРЅСѓСЃ РЅР° СЃР»РµРґ РґРµРї" - ' + adminLogin + '\n' + document.all.item('Comment').innerHTML;
+			alert('Р‘РѕРЅСѓСЃ Рё РєРѕРјРµРјРЅС‚Р°СЂРёР№ СѓРєР°Р·Р°РЅС‹ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… РіСЂР°С„Р°С….\nР§С‚РѕР±С‹ РЅР°С‡РёСЃР»РёС‚СЊ Р±РѕРЅСѓСЃ Рё СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРјРјРµРЅС‚Р°СЂРёР№, РЅР°Р¶РјРёС‚Рµ "РР·РјРµРЅРёС‚СЊ".');
 		}
 	} else {
-		button.value = 'Недостаточно депозитов';
+		button.value = 'РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РґРµРїРѕР·РёС‚РѕРІ';
 		button.disabled = true	
 	}
 	if (!document.all.item('fBonus').checked) {
 		button.disabled = true;
-		button.value = 'Бонус можно начислить только при включенных бонусах!'	
+		button.value = 'Р‘РѕРЅСѓСЃ РјРѕР¶РЅРѕ РЅР°С‡РёСЃР»РёС‚СЊ С‚РѕР»СЊРєРѕ РїСЂРё РІРєР»СЋС‡РµРЅРЅС‹С… Р±РѕРЅСѓСЃР°С…!'	
 	}
 }
 
 function createControl2(offer, a) { 
 /* 
-	Обработка акции "добавление реала к депозиту"
-	пример:
-	31-09-12 23:59 до 05-10-12 00:00 [акция] добавление реала к депу, 20%, мин деп 123$
-	31-09-12 23:59 до 05-10-12 00:00 [акция] добавление реала к депу, 20%, мин деп 123$; акция окончена
+	РћР±СЂР°Р±РѕС‚РєР° Р°РєС†РёРё "РґРѕР±Р°РІР»РµРЅРёРµ СЂРµР°Р»Р° Рє РґРµРїРѕР·РёС‚Сѓ"
+	РїСЂРёРјРµСЂ:
+	31-09-12 23:59 РґРѕ 05-10-12 00:00 [Р°РєС†РёСЏ] РґРѕР±Р°РІР»РµРЅРёРµ СЂРµР°Р»Р° Рє РґРµРїСѓ, 20%, РјРёРЅ РґРµРї 123$
+	31-09-12 23:59 РґРѕ 05-10-12 00:00 [Р°РєС†РёСЏ] РґРѕР±Р°РІР»РµРЅРёРµ СЂРµР°Р»Р° Рє РґРµРїСѓ, 20%, РјРёРЅ РґРµРї 123$; Р°РєС†РёСЏ РѕРєРѕРЅС‡РµРЅР°
 */
 	var dates = getStartEndDates(offer);
 	var startDate = dates[0];
 	var endDate = dates[1];
 	if (endDate < today) {
-		if (offer.indexOf('акция окончена') == -1) {
-			bonusOffers[a] += '; акция окончена';
+		if (offer.indexOf('Р°РєС†РёСЏ РѕРєРѕРЅС‡РµРЅР°') == -1) {
+			bonusOffers[a] += '; Р°РєС†РёСЏ РѕРєРѕРЅС‡РµРЅР°';
 			updateBonusOffers();
 		}  
 		return
 	}
-	var params = offer.match(/^.+\[акция\] добавление реала к депу, (\d+)\%, мин деп (\d+)\$.*$/);
+	var params = offer.match(/^.+\[Р°РєС†РёСЏ\] РґРѕР±Р°РІР»РµРЅРёРµ СЂРµР°Р»Р° Рє РґРµРїСѓ, (\d+)\%, РјРёРЅ РґРµРї (\d+)\$.*$/);
 	var percent = params[1];
 	var minDep = params[2];
-	//Определяется сумма депозитов, за которые можно дать бонус по акции
+	//РћРїСЂРµРґРµР»СЏРµС‚СЃСЏ СЃСѓРјРјР° РґРµРїРѕР·РёС‚РѕРІ, Р·Р° РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РЅРѕ РґР°С‚СЊ Р±РѕРЅСѓСЃ РїРѕ Р°РєС†РёРё
 	var deps = depositsAmountForOffer(startDate);
 	
 	var button = document.createElement('input');
 	button.type = 'button';
 	button.id = 'control' + a;
 	var p = document.createElement('p');
-	p.innerHTML = 'Предложение добавить реал к депозиту: ' + percent + '%, депозит от ' + minDep + '$.<br>У игрока имеются депозиты на сумму: ' + deps + '$.<br>';
+	p.innerHTML = 'РџСЂРµРґР»РѕР¶РµРЅРёРµ РґРѕР±Р°РІРёС‚СЊ СЂРµР°Р» Рє РґРµРїРѕР·РёС‚Сѓ: ' + percent + '%, РґРµРїРѕР·РёС‚ РѕС‚ ' + minDep + '$.<br>РЈ РёРіСЂРѕРєР° РёРјРµСЋС‚СЃСЏ РґРµРїРѕР·РёС‚С‹ РЅР° СЃСѓРјРјСѓ: ' + deps + '$.<br>';
 	p.appendChild(button);
 	document.all.item('bonusPanel').appendChild(p);
 	
 	if (deps >= minDep) {
 		var realToGive = roundToCents(percent / 100 * deps);
-		button.value = 'Начислить реал ' + realToGive + '$';
+		button.value = 'РќР°С‡РёСЃР»РёС‚СЊ СЂРµР°Р» ' + realToGive + '$';
 		button.onclick = function() {
 			document.all.item('fCash_Real').value = +document.all.item('fCash_Real').value + realToGive;
-			bonusOffers[a] += '; акция окончена';
+			bonusOffers[a] += '; Р°РєС†РёСЏ РѕРєРѕРЅС‡РµРЅР°';
 			updateBonusOffers();
-			document.all.item('Comment').innerHTML = dateDDMMYY(today) + ' - реал ' + realToGive + '$ по акции "добавление реала к депу" - ' + adminLogin + '\n' + document.all.item('Comment').innerHTML;
-			alert('Реал и комемнтарий внесены в соответствующие графы.\nЧтобы начислить деньги и сохранить комментарий, нажмите "Изменить".');
+			document.all.item('Comment').innerHTML = dateDDMMYY(today) + ' - СЂРµР°Р» ' + realToGive + '$ РїРѕ Р°РєС†РёРё "РґРѕР±Р°РІР»РµРЅРёРµ СЂРµР°Р»Р° Рє РґРµРїСѓ" - ' + adminLogin + '\n' + document.all.item('Comment').innerHTML;
+			alert('Р РµР°Р» Рё РєРѕРјРµРјРЅС‚Р°СЂРёР№ РІРЅРµСЃРµРЅС‹ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ РіСЂР°С„С‹.\nР§С‚РѕР±С‹ РЅР°С‡РёСЃР»РёС‚СЊ РґРµРЅСЊРіРё Рё СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРјРјРµРЅС‚Р°СЂРёР№, РЅР°Р¶РјРёС‚Рµ "РР·РјРµРЅРёС‚СЊ".');
 		}
 	} else {
-		button.value = 'Недостаточно депозитов';
+		button.value = 'РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РґРµРїРѕР·РёС‚РѕРІ';
 		button.disabled = true	
 	}
 }
 
 function winBackHolidayOffer() {
 /*
-	Акция "Отыграйся" по выходным.
-	- Если игрок проиграл более 1$, то на любой депозит, внесенный в выходные, он получает бонус 75% с вейджером 40;
-	- Если игрок проиграл более 50$, то на депозит, совершенный в выходные, он получает бонус 100% с вейджером 45;
-	- Если игрок проиграл более 100$, то на депозит, совершенный в выходные, он получает бонус 150% с вейджером 50;
-	- Бонус начисляется либо сразу после депозита, либо после проигрыша депозита;
-	- Бонус не начисляется, если сумма на счете превышает размер последнего депозита более чем на 5$;
-	- Акция отменяется до следующих выходных, если игрок выводит выплату;
+	РђРєС†РёСЏ "РћС‚С‹РіСЂР°Р№СЃСЏ" РїРѕ РІС‹С…РѕРґРЅС‹Рј.
+	- Р•СЃР»Рё РёРіСЂРѕРє РїСЂРѕРёРіСЂР°Р» Р±РѕР»РµРµ 1$, С‚Рѕ РЅР° Р»СЋР±РѕР№ РґРµРїРѕР·РёС‚, РІРЅРµСЃРµРЅРЅС‹Р№ РІ РІС‹С…РѕРґРЅС‹Рµ, РѕРЅ РїРѕР»СѓС‡Р°РµС‚ Р±РѕРЅСѓСЃ 75% СЃ РІРµР№РґР¶РµСЂРѕРј 40;
+	- Р•СЃР»Рё РёРіСЂРѕРє РїСЂРѕРёРіСЂР°Р» Р±РѕР»РµРµ 50$, С‚Рѕ РЅР° РґРµРїРѕР·РёС‚, СЃРѕРІРµСЂС€РµРЅРЅС‹Р№ РІ РІС‹С…РѕРґРЅС‹Рµ, РѕРЅ РїРѕР»СѓС‡Р°РµС‚ Р±РѕРЅСѓСЃ 100% СЃ РІРµР№РґР¶РµСЂРѕРј 45;
+	- Р•СЃР»Рё РёРіСЂРѕРє РїСЂРѕРёРіСЂР°Р» Р±РѕР»РµРµ 100$, С‚Рѕ РЅР° РґРµРїРѕР·РёС‚, СЃРѕРІРµСЂС€РµРЅРЅС‹Р№ РІ РІС‹С…РѕРґРЅС‹Рµ, РѕРЅ РїРѕР»СѓС‡Р°РµС‚ Р±РѕРЅСѓСЃ 150% СЃ РІРµР№РґР¶РµСЂРѕРј 50;
+	- Р‘РѕРЅСѓСЃ РЅР°С‡РёСЃР»СЏРµС‚СЃСЏ Р»РёР±Рѕ СЃСЂР°Р·Сѓ РїРѕСЃР»Рµ РґРµРїРѕР·РёС‚Р°, Р»РёР±Рѕ РїРѕСЃР»Рµ РїСЂРѕРёРіСЂС‹С€Р° РґРµРїРѕР·РёС‚Р°;
+	- Р‘РѕРЅСѓСЃ РЅРµ РЅР°С‡РёСЃР»СЏРµС‚СЃСЏ, РµСЃР»Рё СЃСѓРјРјР° РЅР° СЃС‡РµС‚Рµ РїСЂРµРІС‹С€Р°РµС‚ СЂР°Р·РјРµСЂ РїРѕСЃР»РµРґРЅРµРіРѕ РґРµРїРѕР·РёС‚Р° Р±РѕР»РµРµ С‡РµРј РЅР° 5$;
+	- РђРєС†РёСЏ РѕС‚РјРµРЅСЏРµС‚СЃСЏ РґРѕ СЃР»РµРґСѓСЋС‰РёС… РІС‹С…РѕРґРЅС‹С…, РµСЃР»Рё РёРіСЂРѕРє РІС‹РІРѕРґРёС‚ РІС‹РїР»Р°С‚Сѓ;
 */	
 	if (today.getDay() != 0 && today.getDay() != 6) {return 0}
 	var day1 = new Date(today);
@@ -318,7 +318,7 @@ function winBackHolidayOffer() {
 	var lastDeposit = 0;
 	for (var a in transactions) {
 		if (transactions[a].amount > 0 && transactions[a].status.indexOf('OK') != -1 && lastDeposit == 0) {lastDeposit = transactions[a].amount}
-		if (transactions[a].date > day2 /* выходные */ && transactions[a].status.indexOf('OK') != -1 && transactions[a].amount < 0) {withsOnHolidays = true}
+		if (transactions[a].date > day2 /* РІС‹С…РѕРґРЅС‹Рµ */ && transactions[a].status.indexOf('OK') != -1 && transactions[a].amount < 0) {withsOnHolidays = true}
 		if (transactions[a].date < day1 || transactions[a].date > day2) {continue}
 		if (transactions[a].status.indexOf('OK') == -1) {continue}
 		if (transactions[a].amount > 0) {deps += transactions[a].amount}
@@ -326,16 +326,16 @@ function winBackHolidayOffer() {
 	}
 	var p = document.createElement('p');
 	var loss = roundToCents(deps + withs);
-	var s = 'Акция "Отыграйся". С понедельника по пятницу, депозиты: ' + roundToCents(deps) + '$, выплаты: ' + roundToCents(withs) + '$. Проиграно: ' + loss + '$.<br>';
+	var s = 'РђРєС†РёСЏ "РћС‚С‹РіСЂР°Р№СЃСЏ". РЎ РїРѕРЅРµРґРµР»СЊРЅРёРєР° РїРѕ РїСЏС‚РЅРёС†Сѓ, РґРµРїРѕР·РёС‚С‹: ' + roundToCents(deps) + '$, РІС‹РїР»Р°С‚С‹: ' + roundToCents(withs) + '$. РџСЂРѕРёРіСЂР°РЅРѕ: ' + loss + '$.<br>';
 	var button = document.createElement('input');
 	button.type = 'button';
 	if (withsOnHolidays) {
 		button.disabled = true;
-		button.value = 'В эти выходные были выплаты, акция прекращена для игрока'	
+		button.value = 'Р’ СЌС‚Рё РІС‹С…РѕРґРЅС‹Рµ Р±С‹Р»Рё РІС‹РїР»Р°С‚С‹, Р°РєС†РёСЏ РїСЂРµРєСЂР°С‰РµРЅР° РґР»СЏ РёРіСЂРѕРєР°'	
 	} else {
 	if (loss < 1) {
 		button.disabled = true;
-		button.value = 'На неделе проиграно недостаточно денег'
+		button.value = 'РќР° РЅРµРґРµР»Рµ РїСЂРѕРёРіСЂР°РЅРѕ РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РґРµРЅРµРі'
 	} else {
 		var percent = 0.50; 
 		var wager = 40;
@@ -343,27 +343,27 @@ function winBackHolidayOffer() {
 		if (loss >= 100) {percent = 1.00; wager = 50}
 		var holidayDeps = depositsAmountForOffer(new Date(+day2+1000*60));
 		if (holidayDeps == 0) {
-			button.value = 'Недостаточно депозитов';
+			button.value = 'РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РґРµРїРѕР·РёС‚РѕРІ';
 			button.disabled = true		
 		} else {
 			var bonusToGive = roundToCents(holidayDeps * percent);
-			s += 'Есть депозиты на сумму ' + holidayDeps + '$, и можно дать бонус ' + bonusToGive + '$.<br>';
-			button.value = 'Начислить бонус ' + bonusToGive + '$';
+			s += 'Р•СЃС‚СЊ РґРµРїРѕР·РёС‚С‹ РЅР° СЃСѓРјРјСѓ ' + holidayDeps + '$, Рё РјРѕР¶РЅРѕ РґР°С‚СЊ Р±РѕРЅСѓСЃ ' + bonusToGive + '$.<br>';
+			button.value = 'РќР°С‡РёСЃР»РёС‚СЊ Р±РѕРЅСѓСЃ ' + bonusToGive + '$';
 			button.onclick = function() {
 				document.all.item('fCash_Bonus_Add').value = +document.all.item('fCash_Bonus_Add').value + bonusToGive;
 				document.all.item('fCash_Bonus_Wager').value = wager;
-				document.all.item('Comment').innerHTML = dateDDMMYY(today) + ' - бонус ' + bonusToGive + '$ по акции "отыграйся" - ' + adminLogin + '\n' + document.all.item('Comment').innerHTML;
-				alert('Бонус и комемнтарий указаны в соответствующих графах.\nЧтобы начислить бонус и сохранить комментарий, нажмите "Изменить".');				
+				document.all.item('Comment').innerHTML = dateDDMMYY(today) + ' - Р±РѕРЅСѓСЃ ' + bonusToGive + '$ РїРѕ Р°РєС†РёРё "РѕС‚С‹РіСЂР°Р№СЃСЏ" - ' + adminLogin + '\n' + document.all.item('Comment').innerHTML;
+				alert('Р‘РѕРЅСѓСЃ Рё РєРѕРјРµРјРЅС‚Р°СЂРёР№ СѓРєР°Р·Р°РЅС‹ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… РіСЂР°С„Р°С….\nР§С‚РѕР±С‹ РЅР°С‡РёСЃР»РёС‚СЊ Р±РѕРЅСѓСЃ Рё СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРјРјРµРЅС‚Р°СЂРёР№, РЅР°Р¶РјРёС‚Рµ "РР·РјРµРЅРёС‚СЊ".');				
 			}
-			//проверка, включены ли бонусы
+			//РїСЂРѕРІРµСЂРєР°, РІРєР»СЋС‡РµРЅС‹ Р»Рё Р±РѕРЅСѓСЃС‹
 			if (!document.all.item('fBonus').checked) {
 				button.disabled = true;
-				button.value = 'Бонус можно начислить только при включенных бонусах!'	
+				button.value = 'Р‘РѕРЅСѓСЃ РјРѕР¶РЅРѕ РЅР°С‡РёСЃР»РёС‚СЊ С‚РѕР»СЊРєРѕ РїСЂРё РІРєР»СЋС‡РµРЅРЅС‹С… Р±РѕРЅСѓСЃР°С…!'	
 			}
-			//проверка, не слишком ли много денег на счете
+			//РїСЂРѕРІРµСЂРєР°, РЅРµ СЃР»РёС€РєРѕРј Р»Рё РјРЅРѕРіРѕ РґРµРЅРµРі РЅР° СЃС‡РµС‚Рµ
 			if (cash > lastDeposit + 5) {
 				button.disabled = true;
-				button.value = 'Бонус по акции "Отыграйся" дается только если на счете не больше чем (сумма последнего депозита + 5$) и если в выходные не было выплат'	
+				button.value = 'Р‘РѕРЅСѓСЃ РїРѕ Р°РєС†РёРё "РћС‚С‹РіСЂР°Р№СЃСЏ" РґР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РµСЃР»Рё РЅР° СЃС‡РµС‚Рµ РЅРµ Р±РѕР»СЊС€Рµ С‡РµРј (СЃСѓРјРјР° РїРѕСЃР»РµРґРЅРµРіРѕ РґРµРїРѕР·РёС‚Р° + 5$) Рё РµСЃР»Рё РІ РІС‹С…РѕРґРЅС‹Рµ РЅРµ Р±С‹Р»Рѕ РІС‹РїР»Р°С‚'	
 			}			
 		}	
 	}
@@ -375,35 +375,35 @@ function winBackHolidayOffer() {
 
 function processBonusOffers() {
 	bonusOffers = document.all.item('bonus_offer').innerHTML.match(/^.+$/gm);
-	//Разбираем бонусные предложения
+	//Р Р°Р·Р±РёСЂР°РµРј Р±РѕРЅСѓСЃРЅС‹Рµ РїСЂРµРґР»РѕР¶РµРЅРёСЏ
 	for (var a in bonusOffers) {
-		//Находим соответствие одному из типов бонусных предложений
-		if (/акция окончена/.test(bonusOffers[a])) {continue}
-		if (/^.+\[акция\] один бонус на след деп.+$/.test(bonusOffers[a])) {createControl1(bonusOffers[a], a)}
-		if (/^.+\[акция\] добавление реала к депу.+$/.test(bonusOffers[a])) {createControl2(bonusOffers[a], a)}
+		//РќР°С…РѕРґРёРј СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РѕРґРЅРѕРјСѓ РёР· С‚РёРїРѕРІ Р±РѕРЅСѓСЃРЅС‹С… РїСЂРµРґР»РѕР¶РµРЅРёР№
+		if (/Р°РєС†РёСЏ РѕРєРѕРЅС‡РµРЅР°/.test(bonusOffers[a])) {continue}
+		if (/^.+\[Р°РєС†РёСЏ\] РѕРґРёРЅ Р±РѕРЅСѓСЃ РЅР° СЃР»РµРґ РґРµРї.+$/.test(bonusOffers[a])) {createControl1(bonusOffers[a], a)}
+		if (/^.+\[Р°РєС†РёСЏ\] РґРѕР±Р°РІР»РµРЅРёРµ СЂРµР°Р»Р° Рє РґРµРїСѓ.+$/.test(bonusOffers[a])) {createControl2(bonusOffers[a], a)}
 	}
 	winBackHolidayOffer();
-	if (document.all.item('bonusPanel').innerHTML.length == 0) {document.all.item('bonusPanel').innerHTML = 'Сейчас нет активных персональных акций.'} else {
+	if (document.all.item('bonusPanel').innerHTML.length == 0) {document.all.item('bonusPanel').innerHTML = 'РЎРµР№С‡Р°СЃ РЅРµС‚ Р°РєС‚РёРІРЅС‹С… РїРµСЂСЃРѕРЅР°Р»СЊРЅС‹С… Р°РєС†РёР№.'} else {
 		var p = document.createElement('p');
-		p.innerHTML = 'Внимание! На каждый депозит можно активировать только одну акцию, если есть несколько активных. Выберите одну из акций, начислите по ней бонус и сохраните.<br>Учитывается сумма депозитов, сделанных после начала акции, после последней выплаты или после последнего бонуса от администратора (берется позднее).<br>Предупредите игрока о том, что данные бонусы не начисляются автоматически. После совершения депозита нужно зайти в саппорт и попросить начислить бонус по персональной акции.';
+		p.innerHTML = 'Р’РЅРёРјР°РЅРёРµ! РќР° РєР°Р¶РґС‹Р№ РґРµРїРѕР·РёС‚ РјРѕР¶РЅРѕ Р°РєС‚РёРІРёСЂРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РѕРґРЅСѓ Р°РєС†РёСЋ, РµСЃР»Рё РµСЃС‚СЊ РЅРµСЃРєРѕР»СЊРєРѕ Р°РєС‚РёРІРЅС‹С…. Р’С‹Р±РµСЂРёС‚Рµ РѕРґРЅСѓ РёР· Р°РєС†РёР№, РЅР°С‡РёСЃР»РёС‚Рµ РїРѕ РЅРµР№ Р±РѕРЅСѓСЃ Рё СЃРѕС…СЂР°РЅРёС‚Рµ.<br>РЈС‡РёС‚С‹РІР°РµС‚СЃСЏ СЃСѓРјРјР° РґРµРїРѕР·РёС‚РѕРІ, СЃРґРµР»Р°РЅРЅС‹С… РїРѕСЃР»Рµ РЅР°С‡Р°Р»Р° Р°РєС†РёРё, РїРѕСЃР»Рµ РїРѕСЃР»РµРґРЅРµР№ РІС‹РїР»Р°С‚С‹ РёР»Рё РїРѕСЃР»Рµ РїРѕСЃР»РµРґРЅРµРіРѕ Р±РѕРЅСѓСЃР° РѕС‚ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° (Р±РµСЂРµС‚СЃСЏ РїРѕР·РґРЅРµРµ).<br>РџСЂРµРґСѓРїСЂРµРґРёС‚Рµ РёРіСЂРѕРєР° Рѕ С‚РѕРј, С‡С‚Рѕ РґР°РЅРЅС‹Рµ Р±РѕРЅСѓСЃС‹ РЅРµ РЅР°С‡РёСЃР»СЏСЋС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё. РџРѕСЃР»Рµ СЃРѕРІРµСЂС€РµРЅРёСЏ РґРµРїРѕР·РёС‚Р° РЅСѓР¶РЅРѕ Р·Р°Р№С‚Рё РІ СЃР°РїРїРѕСЂС‚ Рё РїРѕРїСЂРѕСЃРёС‚СЊ РЅР°С‡РёСЃР»РёС‚СЊ Р±РѕРЅСѓСЃ РїРѕ РїРµСЂСЃРѕРЅР°Р»СЊРЅРѕР№ Р°РєС†РёРё.';
 		document.all.item('bonusPanel').appendChild(p);	
 	}
 	return 0;
 }
 
 function processPlayerProfile() {
-//Добавляет дополнительную информацию о игроке и рекомендации по начислению бонусов	
+//Р”РѕР±Р°РІР»СЏРµС‚ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅСѓСЋ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РёРіСЂРѕРєРµ Рё СЂРµРєРѕРјРµРЅРґР°С†РёРё РїРѕ РЅР°С‡РёСЃР»РµРЅРёСЋ Р±РѕРЅСѓСЃРѕРІ	
 	try {
 
 	deps = getDepsAll();
 	withs = getWithdrawsAll();
 	//cash = document.getElementsByName('fCash_Real')[0].parentNode.parentNode.children[2].innerHTML;
-	var a = 0; do {a++} while (document.getElementsByTagName('td')[a].innerHTML != 'реальные деньги');
+	var a = 0; do {a++} while (document.getElementsByTagName('td')[a].innerHTML != 'СЂРµР°Р»СЊРЅС‹Рµ РґРµРЅСЊРіРё');
 	cash = document.getElementsByTagName('td')[a].parentNode.children[2].innerHTML;
 	getOperations();
 	//playerStatus = document.getElementsByName('status')[0].options[document.getElementsByName('status')[0].value].innerHTML;
 	
-	//Вставка дополнительной информации в таблицу 
+	//Р’СЃС‚Р°РІРєР° РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё РІ С‚Р°Р±Р»РёС†Сѓ 
 	var table = document.getElementsByTagName('table')[2];
 	var tr = document.createElement('tr');
 	var td1 = document.createElement('td');
@@ -417,32 +417,32 @@ function processPlayerProfile() {
 	tr.appendChild(td2);
 	table.children[1].insertBefore(tr, table.children[1].children[3]);
 	
-	document.getElementById('additionalinfo').innerHTML = 'Всего депозитов: ' + deps + '; выплат: ' + withs + '; итог: ' + roundToCents(deps - withs);
+	document.getElementById('additionalinfo').innerHTML = 'Р’СЃРµРіРѕ РґРµРїРѕР·РёС‚РѕРІ: ' + deps + '; РІС‹РїР»Р°С‚: ' + withs + '; РёС‚РѕРі: ' + roundToCents(deps - withs);
 	
 	if (typeof(document.all.item('Comment')) != 'undefined') {
-	document.all.item('Comment').parentNode.innerHTML = 'Просьба более новые комменты оставлять на самом верху, перенося остальные на одну строку вниз. Так удобнее, если комментов очень много.<br>' + document.all.item('Comment').parentNode.innerHTML;
+	document.all.item('Comment').parentNode.innerHTML = 'РџСЂРѕСЃСЊР±Р° Р±РѕР»РµРµ РЅРѕРІС‹Рµ РєРѕРјРјРµРЅС‚С‹ РѕСЃС‚Р°РІР»СЏС‚СЊ РЅР° СЃР°РјРѕРј РІРµСЂС…Сѓ, РїРµСЂРµРЅРѕСЃСЏ РѕСЃС‚Р°Р»СЊРЅС‹Рµ РЅР° РѕРґРЅСѓ СЃС‚СЂРѕРєСѓ РІРЅРёР·. РўР°Рє СѓРґРѕР±РЅРµРµ, РµСЃР»Рё РєРѕРјРјРµРЅС‚РѕРІ РѕС‡РµРЅСЊ РјРЅРѕРіРѕ.<br>' + document.all.item('Comment').parentNode.innerHTML;
 	}
-	document.all.item('bonus_offer').parentNode.innerHTML = 'Каждое бонусное предложение, добавляемое вручную, располагайте на отдельной строке. Не редактируйте строки с текстом "[акция]" - они редактируются, добавляются и удаляются скриптами.<br>' + document.all.item('bonus_offer').parentNode.innerHTML + '<div id="bonusPanel"></div>';
+	document.all.item('bonus_offer').parentNode.innerHTML = 'РљР°Р¶РґРѕРµ Р±РѕРЅСѓСЃРЅРѕРµ РїСЂРµРґР»РѕР¶РµРЅРёРµ, РґРѕР±Р°РІР»СЏРµРјРѕРµ РІСЂСѓС‡РЅСѓСЋ, СЂР°СЃРїРѕР»Р°РіР°Р№С‚Рµ РЅР° РѕС‚РґРµР»СЊРЅРѕР№ СЃС‚СЂРѕРєРµ. РќРµ СЂРµРґР°РєС‚РёСЂСѓР№С‚Рµ СЃС‚СЂРѕРєРё СЃ С‚РµРєСЃС‚РѕРј "[Р°РєС†РёСЏ]" - РѕРЅРё СЂРµРґР°РєС‚РёСЂСѓСЋС‚СЃСЏ, РґРѕР±Р°РІР»СЏСЋС‚СЃСЏ Рё СѓРґР°Р»СЏСЋС‚СЃСЏ СЃРєСЂРёРїС‚Р°РјРё.<br>' + document.all.item('bonus_offer').parentNode.innerHTML + '<div id="bonusPanel"></div>';
 	
-	//обработка персональных акций, если есть
+	//РѕР±СЂР°Р±РѕС‚РєР° РїРµСЂСЃРѕРЅР°Р»СЊРЅС‹С… Р°РєС†РёР№, РµСЃР»Рё РµСЃС‚СЊ
 	processBonusOffers()
 	
 	} catch(e) {
-		if (adminLogin != 'Phil') {alert('Произошла ошибка. Сообщите id игрока Кириллу в скайп spaze_shuttle\nКод ошибки:\n' + e.message)}
+		if (adminLogin != 'Phil') {alert('РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР°. РЎРѕРѕР±С‰РёС‚Рµ id РёРіСЂРѕРєР° РљРёСЂРёР»Р»Сѓ РІ СЃРєР°Р№Рї spaze_shuttle\nРљРѕРґ РѕС€РёР±РєРё:\n' + e.message)}
 	}
 }
 
 /*
 
-//Функции для страницы транзакций
+//Р¤СѓРЅРєС†РёРё РґР»СЏ СЃС‚СЂР°РЅРёС†С‹ С‚СЂР°РЅР·Р°РєС†РёР№
 
 function processTransactions() {
-//функция ищет непроходящие транзакции и выводит их в отдельный блок
+//С„СѓРЅРєС†РёСЏ РёС‰РµС‚ РЅРµРїСЂРѕС…РѕРґСЏС‰РёРµ С‚СЂР°РЅР·Р°РєС†РёРё Рё РІС‹РІРѕРґРёС‚ РёС… РІ РѕС‚РґРµР»СЊРЅС‹Р№ Р±Р»РѕРє
 	var trn = new Array();
 	var details = new Array();
 	var table = document.getElementsByTagName('tbody')[6];
 	var a = 1;
-	//вносим в массив все транзакции на странице
+	//РІРЅРѕСЃРёРј РІ РјР°СЃСЃРёРІ РІСЃРµ С‚СЂР°РЅР·Р°РєС†РёРё РЅР° СЃС‚СЂР°РЅРёС†Рµ
 	while (table.children[a] != undefined) {
 		var project = table.children[a].children[3].innerHTML;
 		var login = table.children[a].children[4].innerHTML;
@@ -453,8 +453,8 @@ function processTransactions() {
 		details = Array();
 		a++;
 	};
-	//для каждого игрока собираем его попытки транзакций со всеми статусами кроме ADM
-	var player = new Array(); //player[x][0] - логин игрока, player[x][1] - строка с попытками транзакций
+	//РґР»СЏ РєР°Р¶РґРѕРіРѕ РёРіСЂРѕРєР° СЃРѕР±РёСЂР°РµРј РµРіРѕ РїРѕРїС‹С‚РєРё С‚СЂР°РЅР·Р°РєС†РёР№ СЃРѕ РІСЃРµРјРё СЃС‚Р°С‚СѓСЃР°РјРё РєСЂРѕРјРµ ADM
+	var player = new Array(); //player[x][0] - Р»РѕРіРёРЅ РёРіСЂРѕРєР°, player[x][1] - СЃС‚СЂРѕРєР° СЃ РїРѕРїС‹С‚РєР°РјРё С‚СЂР°РЅР·Р°РєС†РёР№
 	for (a = 0; a < trn.length; a++) {
 		for (var b = 0; b < player.length; b++) {if (player[b][0] == trn[a][1]) {break}}
 		if (trn[a][3] == '&nbsp;OK' || trn[a][3] == '&nbsp;ADM') {var color = 'grey'} else {var color = 'red'}
@@ -462,8 +462,8 @@ function processTransactions() {
 		if (player[b] == undefined || player[b][0] != trn[a][1]) {player.push([trn[a][1], s])} 
 			else {player[b][1] = player[b][1] + s}
 	}
-	//выводим игроков, у которых совсем нет успешных транзакций
-	s = 'Игроки, у которых на этой странице нет ни одной успешной транзакции:<br><br>';
+	//РІС‹РІРѕРґРёРј РёРіСЂРѕРєРѕРІ, Сѓ РєРѕС‚РѕСЂС‹С… СЃРѕРІСЃРµРј РЅРµС‚ СѓСЃРїРµС€РЅС‹С… С‚СЂР°РЅР·Р°РєС†РёР№
+	s = 'РРіСЂРѕРєРё, Сѓ РєРѕС‚РѕСЂС‹С… РЅР° СЌС‚РѕР№ СЃС‚СЂР°РЅРёС†Рµ РЅРµС‚ РЅРё РѕРґРЅРѕР№ СѓСЃРїРµС€РЅРѕР№ С‚СЂР°РЅР·Р°РєС†РёРё:<br><br>';
 	b = 0;
 	for (a = 0; a < player.length; a++) {
 		if (player[a][1].indexOf('&nbsp;OK') == -1 && (player[a][1].indexOf('&nbsp;ERROR') != -1 || player[a][1].indexOf('&nbsp;WAIT') != -1)) {
@@ -475,7 +475,7 @@ function processTransactions() {
 }
 
 function addTagForInfo() {
-	//Вставка дополнительной таблицы для информации
+	//Р’СЃС‚Р°РІРєР° РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕР№ С‚Р°Р±Р»РёС†С‹ РґР»СЏ РёРЅС„РѕСЂРјР°С†РёРё
 	var form = document.getElementsByTagName('form')[0];
 	var table = document.createElement('table');
 	var tr = document.createElement('tr');
@@ -499,7 +499,7 @@ function addTagForInfo() {
 	processTransactions();
 }
 
-//Функции для работы на странице истории игр
+//Р¤СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ РЅР° СЃС‚СЂР°РЅРёС†Рµ РёСЃС‚РѕСЂРёРё РёРіСЂ
 
 function findLeapsOfCash() {
     var tag = document.getElementsByTagName('tr');
@@ -513,25 +513,25 @@ function findLeapsOfCash() {
         var cashAfter = parseFloat(tag.children[a - 1].children[7].innerHTML);
         
         if (Math.abs(cashBefore - bet + win - cashAfter) > 0.001) {
-            tag.children[a - 1].children[12].innerHTML = tag.children[a - 1].children[12].innerHTML + '<br><br><font color="red"><b>Между этим раундом и предыдущим <br>изменилась сумма на счете</b></font>';
+            tag.children[a - 1].children[12].innerHTML = tag.children[a - 1].children[12].innerHTML + '<br><br><font color="red"><b>РњРµР¶РґСѓ СЌС‚РёРј СЂР°СѓРЅРґРѕРј Рё РїСЂРµРґС‹РґСѓС‰РёРј <br>РёР·РјРµРЅРёР»Р°СЃСЊ СЃСѓРјРјР° РЅР° СЃС‡РµС‚Рµ</b></font>';
         }
     }
 }
 
 */
 
-//Функции для работы на странице общей статистики
+//Р¤СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ РЅР° СЃС‚СЂР°РЅРёС†Рµ РѕР±С‰РµР№ СЃС‚Р°С‚РёСЃС‚РёРєРё
 
 function addPrognosis() {
-//прогноз показывается только у незавершенного месяца - для этого дата во второй строке должна быть без слова "del"
+//РїСЂРѕРіРЅРѕР· РїРѕРєР°Р·С‹РІР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ Сѓ РЅРµР·Р°РІРµСЂС€РµРЅРЅРѕРіРѕ РјРµСЃСЏС†Р° - РґР»СЏ СЌС‚РѕРіРѕ РґР°С‚Р° РІРѕ РІС‚РѕСЂРѕР№ СЃС‚СЂРѕРєРµ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ Р±РµР· СЃР»РѕРІР° "del"
 	var a = 0;
 	var tag = document.getElementsByTagName('tr');
 	do {a = a + 1;} while (tag[a].children[1] == undefined ||
-						   tag[a].children[1].innerHTML != 'Посещаемость');
-	tag = tag[a].parentNode; //tag = tbody нужной таблицы
+						   tag[a].children[1].innerHTML != 'РџРѕСЃРµС‰Р°РµРјРѕСЃС‚СЊ');
+	tag = tag[a].parentNode; //tag = tbody РЅСѓР¶РЅРѕР№ С‚Р°Р±Р»РёС†С‹
 	var s = tag.children[3].children[0].innerHTML;
 	if (s.indexOf("<b>") > 0) return;
-	//Добавляем строку в таблицу
+	//Р”РѕР±Р°РІР»СЏРµРј СЃС‚СЂРѕРєСѓ РІ С‚Р°Р±Р»РёС†Сѓ
 	
 	var newTR = document.createElement('tr');
 	for (a = 0; a < 15; a++) {
@@ -542,8 +542,8 @@ function addPrognosis() {
 	}
 	tag.insertBefore(newTR, tag.children[2]);
 
-	//Заполняем данными
-	tag.children[2].children[0].innerHTML = '<center><b>Прогноз</b></center>';
+	//Р—Р°РїРѕР»РЅСЏРµРј РґР°РЅРЅС‹РјРё
+	tag.children[2].children[0].innerHTML = '<center><b>РџСЂРѕРіРЅРѕР·</b></center>';
 
 	b = tag.children[4].children[0].innerHTML.substring(8, 10) * 1;
 	if (isNaN(b)) {b = tag.children[4].children[0].children[0].innerHTML.substring(8, 10) * 1};
@@ -576,7 +576,7 @@ function addPrognosis() {
 
 /*
 
-//Функции для страницы описания раунда в рулетке
+//Р¤СѓРЅРєС†РёРё РґР»СЏ СЃС‚СЂР°РЅРёС†С‹ РѕРїРёСЃР°РЅРёСЏ СЂР°СѓРЅРґР° РІ СЂСѓР»РµС‚РєРµ
 
 function paintCells() {
 	var numbers = new Array(37);
@@ -638,7 +638,7 @@ function addRoulettePic() {
 	setTimeout(paintCells, 1000);
 }
 
-//Функции для сбора данных со всех страниц на первой странице
+//Р¤СѓРЅРєС†РёРё РґР»СЏ СЃР±РѕСЂР° РґР°РЅРЅС‹С… СЃРѕ РІСЃРµС… СЃС‚СЂР°РЅРёС† РЅР° РїРµСЂРІРѕР№ СЃС‚СЂР°РЅРёС†Рµ
 
 var currentPage = 1;
 var lastPage = 0;
@@ -653,15 +653,15 @@ function scanPage(page) {
 	get.send(null);
 	while (get.readyState != 4) {}
 	var code = get.responseText;
-	if (get.status != 200 || code.indexOf('Internal Server Error') > -1) {alert('Одна из страниц не загрузилась!'); return 0}
-	var a = code.indexOf('Страницы:');
+	if (get.status != 200 || code.indexOf('Internal Server Error') > -1) {alert('РћРґРЅР° РёР· СЃС‚СЂР°РЅРёС† РЅРµ Р·Р°РіСЂСѓР·РёР»Р°СЃСЊ!'); return 0}
+	var a = code.indexOf('РЎС‚СЂР°РЅРёС†С‹:');
 	while (code.substr(a, 6) != '<table') {a++}
 	while (code.substr(a, 5) != '</tr>') {a++}
 	a = a + 5;
 	var b = a;
 	while (code.substr(b+1, 8) != '</table>') {b++}
 	contentTable.innerHTML = contentTable.innerHTML + code.substring(a, b);
-	for (a = 0; a < document.links.length; a++) {if (document.links[a].innerHTML == '[' + page + ']') {document.links[a].innerHTML = '[готого]'}}
+	for (a = 0; a < document.links.length; a++) {if (document.links[a].innerHTML == '[' + page + ']') {document.links[a].innerHTML = '[РіРѕС‚РѕРіРѕ]'}}
 	if (page != lastPage) {setTimeout("scanPage(" + (page + 1) + ");", 100)} else {document.getElementById('scanpages').disabled = 'disabled'}
 }
 
@@ -683,7 +683,7 @@ function addPagesScanner() {
 		}
 	}
 	var tag = document.getElementsByTagName("small");
-	a = 0; while (tag[a].innerHTML.indexOf('Страницы:') == -1) {a++}
+	a = 0; while (tag[a].innerHTML.indexOf('РЎС‚СЂР°РЅРёС†С‹:') == -1) {a++}
 	tag = tag[a].parentNode;
 	tag.id = 'tdContainingPagesLinks';
 
@@ -694,15 +694,15 @@ function addPagesScanner() {
 	a = s.indexOf('Page=') + 5; while (s[a] != '&' && a != s.length - 1) {a++}
 	urlPart2 = (a != s.length - 1) ? s.substring(a) : '';
 
-	tag.innerHTML = tag.innerHTML + '<br><br><input type="button" value=" Показать все на одной " id="scanpages" onclick="scanPages()"> (Сделайте показ по 100 элементов на странице. Не нажимайте на кнопку, если в выдаче очень много страниц)';
+	tag.innerHTML = tag.innerHTML + '<br><br><input type="button" value=" РџРѕРєР°Р·Р°С‚СЊ РІСЃРµ РЅР° РѕРґРЅРѕР№ " id="scanpages" onclick="scanPages()"> (РЎРґРµР»Р°Р№С‚Рµ РїРѕРєР°Р· РїРѕ 100 СЌР»РµРјРµРЅС‚РѕРІ РЅР° СЃС‚СЂР°РЅРёС†Рµ. РќРµ РЅР°Р¶РёРјР°Р№С‚Рµ РЅР° РєРЅРѕРїРєСѓ, РµСЃР»Рё РІ РІС‹РґР°С‡Рµ РѕС‡РµРЅСЊ РјРЅРѕРіРѕ СЃС‚СЂР°РЅРёС†)';
 	while (tag.tagName != 'TABLE') {tag = tag.parentNode}
 	contentTable = tag.nextElementSibling.children[0];
 }
 
-//Сколько купонов активировал каждый игрок?
+//РЎРєРѕР»СЊРєРѕ РєСѓРїРѕРЅРѕРІ Р°РєС‚РёРІРёСЂРѕРІР°Р» РєР°Р¶РґС‹Р№ РёРіСЂРѕРє?
 
 function countCoupons() {
-	if (document.getElementById('scanpages') != undefined && !document.getElementById('scanpages').disabled) {alert('Сначала нажмите на кнопку "Показать все страницы на одной"'); return 0}
+	if (document.getElementById('scanpages') != undefined && !document.getElementById('scanpages').disabled) {alert('РЎРЅР°С‡Р°Р»Р° РЅР°Р¶РјРёС‚Рµ РЅР° РєРЅРѕРїРєСѓ "РџРѕРєР°Р·Р°С‚СЊ РІСЃРµ СЃС‚СЂР°РЅРёС†С‹ РЅР° РѕРґРЅРѕР№"'); return 0}
 	var tag = document.getElementById("tdContainingPagesLinks");
 	tag = tag.parentNode.parentNode.parentNode.nextElementSibling.children[0];
 	if (tag.children.length > 1) {
@@ -710,7 +710,7 @@ function countCoupons() {
 			var number = 0;
 			var player = tag.children[a].children[2].children[0].innerHTML;
 			for (var b = 1; b < tag.children.length; b++) {if (tag.children[b].children[2].children[0].innerHTML == player) {number++}}
-			tag.children[a].children[2].innerHTML += ', активирован раз: ' + number;
+			tag.children[a].children[2].innerHTML += ', Р°РєС‚РёРІРёСЂРѕРІР°РЅ СЂР°Р·: ' + number;
 		}
 	}
 	document.getElementById("countCouponsButton").disabled = 'disabled';
@@ -718,26 +718,26 @@ function countCoupons() {
 
 function addNumberOfActivatedCoupons() {
 	var tag = document.getElementById("tdContainingPagesLinks");
-	tag.innerHTML += '<br><input type="button" id="countCouponsButton" value="Сколько купонов на этой странице у каждого игрока?" onclick="countCoupons()">';
+	tag.innerHTML += '<br><input type="button" id="countCouponsButton" value="РЎРєРѕР»СЊРєРѕ РєСѓРїРѕРЅРѕРІ РЅР° СЌС‚РѕР№ СЃС‚СЂР°РЅРёС†Рµ Сѓ РєР°Р¶РґРѕРіРѕ РёРіСЂРѕРєР°?" onclick="countCoupons()">';
 }
 
 */
 
-//Выбор действий
+//Р’С‹Р±РѕСЂ РґРµР№СЃС‚РІРёР№
 
 function processPage() {
-//определяет раздел админки и вызывает соответствующую функцию
+//РѕРїСЂРµРґРµР»СЏРµС‚ СЂР°Р·РґРµР» Р°РґРјРёРЅРєРё Рё РІС‹Р·С‹РІР°РµС‚ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰СѓСЋ С„СѓРЅРєС†РёСЋ
 	var s = document.documentElement.innerHTML;
-	if (s.indexOf("информация о пользователе") > -1) {processPlayerProfile()}
+	if (s.indexOf("РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ РїРѕР»СЊР·РѕРІР°С‚РµР»Рµ") > -1) {processPlayerProfile()}
 /*
-	if (s.indexOf("список транзакций") > -1) {addTagForInfo()}
-    if (s.indexOf("список игровых туров:") > -1 && document.getElementsByName('UsersID')[0].value != '') {findLeapsOfCash()}
+	if (s.indexOf("СЃРїРёСЃРѕРє С‚СЂР°РЅР·Р°РєС†РёР№") > -1) {addTagForInfo()}
+    if (s.indexOf("СЃРїРёСЃРѕРє РёРіСЂРѕРІС‹С… С‚СѓСЂРѕРІ:") > -1 && document.getElementsByName('UsersID')[0].value != '') {findLeapsOfCash()}
 */
-	if (s.indexOf("общая информация о работе казино") > -1) {addPrognosis()}
+	if (s.indexOf("РѕР±С‰Р°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЂР°Р±РѕС‚Рµ РєР°Р·РёРЅРѕ") > -1) {addPrognosis()}
 /*
-	if ((s.indexOf("roulette:") > -1 || s.indexOf("french_roulette_track:") > -1) && s.indexOf("Номер игры") > -1) {addRoulettePic()}
-	if (s.indexOf("Страницы:") > -1) {addPagesScanner()}
-	if (s.indexOf("Список выданных купонов:") > -1) {addNumberOfActivatedCoupons()} 
+	if ((s.indexOf("roulette:") > -1 || s.indexOf("french_roulette_track:") > -1) && s.indexOf("РќРѕРјРµСЂ РёРіСЂС‹") > -1) {addRoulettePic()}
+	if (s.indexOf("РЎС‚СЂР°РЅРёС†С‹:") > -1) {addPagesScanner()}
+	if (s.indexOf("РЎРїРёСЃРѕРє РІС‹РґР°РЅРЅС‹С… РєСѓРїРѕРЅРѕРІ:") > -1) {addNumberOfActivatedCoupons()} 
 */
 }
 
