@@ -159,7 +159,7 @@ function getAllTransactions() {
 }
 
 function getStartEndDates(offer) {
-	var params = offer.match(/^(\d{2})-(\d{2})-(\d{2}) (\d{2}):(\d{2}) до (\d{2})-(\d{2})-(\d{2}) (\d{2}):(\d{2}).+$/);
+	var params = offer.match(/^(\d{1,2})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}) до (\d{1,2})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}).+$/);
 	var startDate = new Date(+params[3] + 2000, params[2] - 1, params[1], params[4], params[5]);
 	var endDate = new Date(+params[8] + 2000, params[7] - 1, params[6], params[9], params[10]);
 	return [startDate, endDate]
